@@ -1,10 +1,10 @@
 import Joi from "joi";
 
 export const addAdvertValidators = Joi.object({
-    title: Joi.String().required(),
-    description: Joi.String().required(),
-    user: Joi.String().required(),
-    category: Joi.String().valid(
+    title: Joi.string().required(),
+    description: Joi.string().required(),
+    user: Joi.s().required(),
+    category: Joi.string().valid(
         "clothing and accessories",
         "Electronics and gadgets",
         "Home and living",
@@ -19,6 +19,6 @@ export const addAdvertValidators = Joi.object({
         "Art and collectibles",
         "Digital Product",
         "Services").required(),
-    img: Joi.String().optional(),
+    img: Joi.string().optional(),
     price: Joi.number().required()
 });

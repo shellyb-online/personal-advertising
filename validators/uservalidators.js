@@ -1,14 +1,22 @@
 import Joi from "joi";
 
 export const userRegisterValidator = Joi.object({
-    firstname: Joi.String().required(),
-    lastname: Joi.String().required(),
-    email: Joi.String(),
-    password: Joi.String(),
-    role: Joi.String().required(),
+    firstName: Joi.string().required(),
+    lastName: Joi.string().required(),
+    email: Joi.string().required(),
+    password: Joi.string().required(),
+    role: Joi.string().required()
 });
 
 export const userLoginValidator = Joi.object({
- emai: Joi.String(),
- password: Joi.String()
+    email: Joi.string().required(),
+    password: Joi.string().required()
 });
+
+export const userUpdateValidator = Joi.object({
+    firstName: Joi.string(),
+    lastName: Joi.string(),
+    email: Joi.string(),
+    password: Joi.string()
+});
+

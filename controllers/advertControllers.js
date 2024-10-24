@@ -4,14 +4,14 @@ import { AdvertModel } from "../models/advertmodels.js";
 
 export const addAdvert = async (req, res, next) => {
     try {
-        const { error } = advertValidationSchema.validate(req.body);
+        const { error, value } = addAdvertValidators.validate(req.body);
         if (error) {
-            return res.status(400).json({ status: 'error', message: error.details[0].message });
+            return res.status(422).json(error);
         }
 
-        const advert = new AdvertModel(req.body);
-        const savedAdvert = await advert.save();
-        res.status(201).json(savedAdvert);
+        const newadvert = await AdvertModel.create(req.body);
+        // const savedAdvert = await advert.save();
+        res.status(201).json(newadvert);
     } catch (error) {
         next(error);
     }
@@ -23,24 +23,27 @@ export const addAdvert = async (req, res, next) => {
 export const getAllAdverts = async (req, res, next) => {
 
     try {
-        const adverts = await AdvertModel.find();
-
+        const { filter = "{}", limit = 10, skip = 0 } = req.query;
+        const adverts = await AdvertModel
+            .find(JSON.parse(filter))
+            .limit(limit)
+            .skip(skip);
         res.status(200).json(adverts);
     } catch (error) {
         next(error);
     }
 };
 
-// Fetch all advert to find the correct one based on the custom ID
+// Retrieving an advert by an id (both vendor and a user)
 
 export const getAdvertById = async (req, res, next) => {
     try {
-        const advertId = req.params.id;
-        const advert = await AdvertModel.findById(advertId);
-        if (!advert) {
-            return res.status(404).json('advert not found');
+        // const advertId = req.params.id;
+        const advertId = await AdvertModel.findById(req.params.id);
+        if (!advertId) {
+            return res.status(404).json("No advert found");
         }
-        res.status(200).json(advert);
+        res.status(200).json(advertId);
     } catch (error) {
         next(error);
 
@@ -51,12 +54,16 @@ export const getAdvertById = async (req, res, next) => {
 // Update the advert in the database using its ID
 export const updateAdvert = async (req, res, next) => {
     try {
-        const { error } = advertValidationSchema.validate(req.body);
-        if (error) {
-            return res.status(400).json("Advert updated successfully");
+        const updateAdvert = await AdvertModel.findByIdAndUpdate(req.params.id.req.body, { new: true });
+        if (!updateAdvert) {
+            return res.status(404).json("update wasnt successfull");
         }
-        await AdvertModel.findByIdAndUpdate(req.params.id, req.body, { new: true });
-        res.status(200).json("Advert Updated!");
+        // const { error } = advertValidationSchema.validate(req.body);
+        // if (error) {
+        //     return res.status(400).json("Advert updated successfully");
+        // }
+        // await AdvertModel.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        res.status(200).json(updateAdvert);
     } catch (error) {
         next(error);
     }
@@ -98,9 +105,12 @@ export const updateAdvert = async (req, res, next) => {
 
 export const deleteAdvert = async (req, res, next) => {
     try {
-        await AdvertModel.findByIdAndDelete(req.params.id);
-        res.status(200).json("advert was deleted");
+        const deleteAdvert = await AdvertModel.findByIdAndDelete({ _id: req.params.id, });
+        if (!deleteAdvert) {
+            res.status(404).json("Nothing to Delete");
+        }
+        res.status(200).json("Deleted successfully");
     } catch (error) {
         next(error);
     }
-}
+};  
